@@ -151,6 +151,9 @@ vim.opt.inccommand = 'split'
 -- Show which line your cursor is on
 vim.opt.cursorline = true
 
+-- Draw a vertical line to show the line length limit
+vim.opt.colorcolumn = 79
+
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
@@ -568,6 +571,8 @@ require('lazy').setup({
         clangd = { filetypes = { 'c', 'cpp', 'cuda' } },
         gopls = {},
         pyright = {},
+        ruff = {},
+        marksman = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
