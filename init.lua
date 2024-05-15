@@ -152,7 +152,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Draw a vertical line to show the line length limit
-vim.opt.colorcolumn = 79
+vim.opt.colorcolumn = '79'
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
