@@ -114,6 +114,17 @@ vim.opt.showmode = false
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 vim.opt.clipboard = 'unnamedplus'
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy '+',
+    ['*'] = require('vim.ui.clipboard.osc52').copy '*',
+  },
+  paste = {
+    ['+'] = require('vim.ui.clipboard.osc52').paste '+',
+    ['*'] = require('vim.ui.clipboard.osc52').paste '*',
+  },
+}
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -281,32 +292,23 @@ require('lazy').setup({
 
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
-    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-    config = function() -- This is the function that runs, AFTER loading
+    event = 'VimEnter',
+    config = function()
       require('which-key').setup()
 
       -- Document existing key chains
       require('which-key').add {
         { '<leader>c', group = '[C]ode' },
-        { '<leader>c_', hidden = true },
         { '<leader>d', group = '[D]ocument' },
-        { '<leader>d_', hidden = true },
         { '<leader>h', group = 'Git [H]unk' },
-        { '<leader>h_', hidden = true },
-        { '<leader>r', group = '[R]ename' },
-        { '<leader>r_', hidden = true },
-        { '<leader>s', group = '[S]earch' },
-        { '<leader>s_', hidden = true },
-        { '<leader>t', group = '[T]oggle' },
-        { '<leader>t_', hidden = true },
         { '<leader>w', group = '[W]orkspace' },
-        { '<leader>w_', hidden = true },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>t', group = '[T]oggle' },
       }
       -- visual mode
-      require('which-key').register {
-        '<leader>h',
-        desc = 'Git [H]unk',
-        mode = 'v',
+      require('which-key').add {
+        { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
       }
     end,
   },
@@ -927,6 +929,9 @@ require('lazy').setup({
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
 }, {
+  rocks = {
+    enabled = false,
+  },
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
