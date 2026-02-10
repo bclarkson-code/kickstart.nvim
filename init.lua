@@ -330,7 +330,7 @@ require('lazy').setup({
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
-    branch = '0.1.x',
+    -- branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -611,7 +611,6 @@ require('lazy').setup({
         elixirls = {},
         ruff = {},
         marksman = {},
-        prettierd = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -839,6 +838,50 @@ require('lazy').setup({
     end,
   },
 
+  -- Image support
+  {
+    '3rd/image.nvim',
+    build = false, -- so that it doesn't build the rock https://github.com/3rd/image.nvim/issues/91#issuecomment-2453430239
+    opts = {
+      processor = 'magick_cli',
+      backend = 'kitty',
+      max_width = 100,
+      max_height = 12,
+      max_height_window_percentage = math.huge,
+      max_width_window_percentage = math.huge,
+      window_overlap_clear_enabled = true, -- toggles images when windows are overlapped
+      window_overlap_clear_ft_ignore = { 'cmp_menu', 'cmp_docs', '' },
+    },
+  },
+
+  -- Jupyter notebooks
+  {
+    'benlubas/molten-nvim',
+    version = '^1.0.0',
+    build = ':UpdateRemotePlugins',
+    init = function()
+      vim.g.molten_output_win_max_height = 12
+      vim.g.python3_host_prog = vim.fn.expand '~/.config/nvim/.venv/bin/python3'
+      vim.g.molten_image_provider = 'image.nvim'
+    end,
+    ft = { 'ipynb', 'python' },
+    keys = {
+      { '<leader>mi', '<cmd>MoltenInit<CR>', desc = 'Initialize Molten' },
+      { '<leader>mo', '<cmd>MoltenEvaluateOperator<CR>', desc = 'Evaluate Operator' },
+      { '<leader>ml', '<cmd>MoltenEvaluateLine<CR>', desc = 'Evaluate Line' },
+      { '<leader>mv', ':<C-u>MoltenEvaluateVisual<CR>gv', mode = 'v', desc = 'Evaluate Visual' },
+      { '<leader>mr', '<cmd>MoltenReevaluateCell<CR>', desc = 'Re-evaluate Cell' },
+      { '<leader>mx', '<cmd>MoltenInterrupt<CR>', desc = 'Interrupt Kernel' },
+      { '<leader>md', '<cmd>MoltenDelete<CR>', desc = 'Delete Cell' },
+      { '<leader>mh', '<cmd>MoltenHideOutput<CR>', desc = 'Hide Output' },
+      { '<leader>ms', '<cmd>MoltenShowOutput<CR>', desc = 'Show Output' },
+    },
+  },
+  {
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+  },
+
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -896,19 +939,17 @@ require('lazy').setup({
       indent = { enable = true, disable = { 'ruby' } },
     },
     config = function(_, opts)
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
-      -- Prefer git instead of curl in order to improve connectivity in some environments
+      -- Prefer git instead of curl
       require('nvim-treesitter.install').prefer_git = true
-      ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
 
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+      -- Use a protected call to handle the setup
+      local status, ts_configs = pcall(require, 'nvim-treesitter.configs')
+      if status then
+        ts_configs.setup(opts)
+      else
+        -- If the module is missing, we use the new direct setup method
+        require('nvim-treesitter').setup(opts)
+      end
     end,
   },
 
